@@ -1,0 +1,24 @@
+node_modules/
+.env
+cache/
+artifacts/
+typechain-types/
+coverage/
+coverage.json
+deployment.json
+
+# Frontend build
+frontend/dist/
+frontend/node_modules/
+
+# Backend
+backend/node_modules/
+backend/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

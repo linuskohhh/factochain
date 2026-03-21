@@ -1,0 +1,23 @@
+{
+  "name": "factochain",
+  "version": "1.0.0",
+  "description": "FactoChain: A Tokenized Invoice Factoring DApp for SME Financing",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network hardhat",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "node": "hardhat node",
+    "verify": "hardhat verify --network sepolia"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "keywords": ["blockchain", "defi", "invoice-factoring", "erc1155", "ethereum"],
+  "license": "MIT"
+}
