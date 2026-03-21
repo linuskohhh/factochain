@@ -1,4 +1,4 @@
-# ⛓ FactoChain
+# FactoChain
 
 **A Tokenized Invoice Factoring DApp for SME Financing**
 
