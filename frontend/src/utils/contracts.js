@@ -51,14 +51,75 @@ export const STATE_COLORS = {
 };
 
 // Connect wallet
+// Sepolia chain ID
+const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111 in hex
+
+// Connect wallet — handles multiple wallet extensions, forces Sepolia
 export async function connectWallet() {
-  if (!window.ethereum) throw new Error("MetaMask not installed");
-  const provider = new ethers.BrowserProvider(window.ethereum);
-  await provider.send("eth_requestAccounts", []);
+  let eth = null;
+
+  if (window.ethereum?.providers?.length) {
+    eth = window.ethereum.providers.find((p) => p.isMetaMask) || window.ethereum.providers[0];
+  } else if (window.ethereum?.isMetaMask) {
+    eth = window.ethereum;
+  } else if (window.ethereum) {
+    eth = window.ethereum;
+  }
+
+  if (!eth) throw new Error("MetaMask not installed. Please install MetaMask and refresh.");
+
+  // Force switch to Sepolia before doing anything else
+  try {
+    await eth.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: SEPOLIA_CHAIN_ID }],
+    });
+  } catch (switchError) {
+    if (switchError.code === 4902) {
+      await eth.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: SEPOLIA_CHAIN_ID,
+          chainName: "Sepolia Testnet",
+          nativeCurrency: { name: "SepoliaETH", symbol: "ETH", decimals: 18 },
+          rpcUrls: ["https://rpc.sepolia.org"],
+          blockExplorerUrls: ["https://sepolia.etherscan.io"],
+        }],
+      });
+    } else {
+      throw new Error("Please switch MetaMask to Sepolia testnet to use FactoChain.");
+    }
+  }
+
+  const provider = new ethers.BrowserProvider(eth);
+  const accounts = await provider.send("eth_requestAccounts", []);
+  if (!accounts || accounts.length === 0) throw new Error("No accounts returned. Please unlock MetaMask.");
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
   const network = await provider.getNetwork();
   return { provider, signer, address, chainId: Number(network.chainId) };
+}
+
+// Force MetaMask to show the account picker
+export async function switchAccount() {
+  let eth = null;
+
+  if (window.ethereum?.providers?.length) {
+    eth = window.ethereum.providers.find((p) => p.isMetaMask) || window.ethereum.providers[0];
+  } else {
+    eth = window.ethereum;
+  }
+
+  if (!eth) throw new Error("MetaMask not installed");
+
+  // This opens the MetaMask account picker
+  await eth.request({
+    method: "wallet_requestPermissions",
+    params: [{ eth_accounts: {} }],
+  });
+
+  // Now reconnect with the newly selected account
+  return connectWallet();
 }
 
 // Get contract instances

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
 import {
-  connectWallet, getContracts, fetchAllInvoices, uploadToIPFS, pinMetadata,
+  connectWallet, switchAccount, getContracts, fetchAllInvoices, uploadToIPFS, pinMetadata,
   INVOICE_STATES, STATE_COLORS
 } from "./utils/contracts.js";
 
@@ -82,9 +82,25 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {txStatus && <span style={{ fontSize: 13, color: "#94a3b8" }}>{txStatus}</span>}
           {wallet ? (
-            <span style={{ ...styles.btn, ...styles.btnSuccess, cursor: "default" }}>
-              {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
-            </span>
+            <div style={{ display: "flex", gap: 8 }}>
+              <span style={{ ...styles.btn, ...styles.btnSuccess, cursor: "default" }}>
+                {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
+              </span>
+              <button style={{ ...styles.btn, ...styles.btnSecondary }} onClick={async () => {
+                try {
+                  setTxStatus("Switching account...");
+                  const w = await switchAccount();
+                  setWallet(w);
+                  const c = getContracts(w.signer);
+                  setContracts(c);
+                  setTxStatus(`Switched to: ${w.address.slice(0, 6)}...${w.address.slice(-4)}`);
+                } catch (err) {
+                  setTxStatus(`Error: ${err.message}`);
+                }
+              }}>
+                Switch Account
+              </button>
+            </div>
           ) : (
             <button style={{ ...styles.btn, ...styles.btnPrimary }} onClick={handleConnect}>
               Connect Wallet

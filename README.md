@@ -67,7 +67,7 @@ You will also need accounts for:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/<linuskohhh>/factochain.git
+git clone https://github.com/linuskohhh/factochain.git
 cd factochain
 ```
 
